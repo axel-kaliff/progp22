@@ -121,7 +121,7 @@ profileDistTest = snabbtest profileDistance profiles
 -- rat                             0.0     0.017   0.256
 -- mouse                                   0.0     0.259
 -- frog                                            0.0
-distMatrixTest1 = distanceMatrix (seqdata foxp4)
+--distMatrixTest1 = distanceMatrix (seqdata foxp4)
 
 -- Should produce the following matrix (values rounded):
 --        fam1    fam2    fam3    fam4    fam5
@@ -130,6 +130,6 @@ distMatrixTest1 = distanceMatrix (seqdata foxp4)
 ---fam3                     0.0   160.0   154.1
 ---fam4                             0.0   167.0
 ---fam5                                     0.0
-distMatrixTest2 = distanceMatrix profiles
+--distMatrixTest2 = distanceMatrix profiles
 
 

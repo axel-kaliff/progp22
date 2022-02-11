@@ -1,3 +1,6 @@
+module F2 where
+import Data.List
+
 ---- 2 Molekylära sekvenser ----
 
 data MolSeq = MolSeq {sequenceName:: String, sequence :: String, sequenceType :: SeqType} deriving (Show, Eq)
@@ -22,6 +25,9 @@ seqSequence (MolSeq _ sequence _) = sequence
 
 seqLength :: MolSeq -> Int
 seqLength (MolSeq _ sequence _) = length sequence 
+
+seqType :: MolSeq -> SeqType
+seqType (MolSeq _ _ seqtype) = seqtype
 
 
 data SeqType = DNA | Protein deriving(Eq, Show)
@@ -54,15 +60,17 @@ hammingDistance x1 x2
 ---- 3 Profiler och sekvenser ----
 
 nucleotides = "ACGT"
-aminoacids = sort "ARNDCEQGHILKMFPSTWYV"
+aminoacids = "ARNDCEQGHILKMFPSTWYV"
 
-makeProfileMatrix :: [MolSeq] -> Matrix
+makeProfileMatrix :: [MolSeq] -> [[(Char, Int)]]
 makeProfileMatrix [] = error "Empty sequence list"
 makeProfileMatrix sl = res
    where
       -- Evaluates sequence type from head of sequence list
       t = seqType (head sl)
+
       -- creates a list of tuples of each nucleotide/aminoacid (depending on type) and a 0
+      -- e.g. for dna: defaults = [('A',0),('C',0),('G',0),('T',0)]
       defaults =     
          if (t == DNA) then
             zip nucleotides (replicate (length nucleotides) 0) -- Rad (i)
@@ -72,26 +80,35 @@ makeProfileMatrix sl = res
       -- extracts sequences from input and puts in list 'strs'
       strs = map seqSequence sl -- Rad (iii)
       
-      tmp1 = map (map (\x -> ((head x), (length x))) . group . sort)
-      (transpose strs) -- Rad (iv)
+      -- Counts the number of each nucleotide/aminoacid in each position
+      tmp1 = map (map (\x -> ((head x), (length x))) . group . sort) (transpose strs) -- Rad (iv)
       equalFst a b = (fst a) == (fst b)
       res = map sort (map (\l -> unionBy equalFst l defaults) tmp1)
 
-data Profile = Profile {profileName :: String, matrix :: Matrix, sequenceType :: seqType, numOfSeqs :: Int}
+data Profile = Profile {name :: String, matrix :: [[(Char, Int)]], sequencType :: SeqType, numOfSeqs :: Int}
 
 molseqs2profile :: String -> [MolSeq] -> Profile
-molseqs2profile s mols = 
-   | isDNA head mols = Profile s makeProfileMatrix mols DNA length mols
-   | otherwise = Profile s makeProfileMatrix mols Protein length mols
+molseqs2profile s mols 
+   | isDNA (seqSequence (head mols)) = Profile s (makeProfileMatrix mols) DNA (length mols)
+   | otherwise = Profile s (makeProfileMatrix mols) Protein (length mols)
 
 profileName :: Profile -> String
 profileName (Profile name _ _ _) = name
 
-profileFrequency :: Profile -> Int -> Char -> Double
--- TODO fixa så att:
--- profil p, en heltalsposition i, och ett tecken c, och returnerar den relativa frekvensen för tecken c på position i i profilen p 
-profileFrequency (Profile _ matrix _ _) index char = getElem 
+profileMatrix :: Profile -> [[(Char, Int)]]
+profileMatrix (Profile _ matrix _ _) = matrix
 
+profileType :: Profile -> SeqType
+profileType (Profile _ _ sequenceType _) = sequenceType
+
+profileFrequency :: Profile -> Int -> Char -> Double
+profileFrequency (Profile _ matrix _ num) index char = (fromIntegral (snd (head (filter (\x -> fst x == char) (matrix !! index))))) / (fromIntegral num)
+
+profileSeqLength :: Profile -> Int
+profileSeqLength (Profile _ matrix _ _) = length matrix
 
 profileDistance :: Profile -> Profile -> Double
--- TODO beräkna avstånd mellan profilerna
+profileDistance profile1 profile2
+    | profileType profile1  == DNA = sum [abs ((profileFrequency profile1 x y) - (profileFrequency profile2 x y) )| y <- nucleotides, x <- [0..(profileSeqLength profile1)-1]]
+    | otherwise = sum [abs ((profileFrequency profile1 x y) - (profileFrequency profile2 x y) )| y <- aminoacids, x <- [0..(profileSeqLength profile1)-1]]
+
