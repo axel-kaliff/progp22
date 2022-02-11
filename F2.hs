@@ -1,3 +1,5 @@
+---- 2 Molekylära sekvenser ----
+
 data MolSeq = MolSeq {sequenceName:: String, sequence :: String, sequenceType :: SeqType} deriving (Show, Eq)
 
 string2seq :: String -> String -> MolSeq
@@ -49,3 +51,47 @@ hammingDistance x1 x2
    | head x1 == head x2 = hammingDistance (tail x1) (tail x2)
    | otherwise = 1 + hammingDistance (tail x1) (tail x2)
 
+---- 3 Profiler och sekvenser ----
+
+nucleotides = "ACGT"
+aminoacids = sort "ARNDCEQGHILKMFPSTWYV"
+
+makeProfileMatrix :: [MolSeq] -> Matrix
+makeProfileMatrix [] = error "Empty sequence list"
+makeProfileMatrix sl = res
+   where
+      -- Evaluates sequence type from head of sequence list
+      t = seqType (head sl)
+      -- creates a list of tuples of each nucleotide/aminoacid (depending on type) and a 0
+      defaults =     
+         if (t == DNA) then
+            zip nucleotides (replicate (length nucleotides) 0) -- Rad (i)
+         else
+            zip aminoacids (replicate (length aminoacids) 0) -- Rad (ii)
+   
+      -- extracts sequences from input and puts in list 'strs'
+      strs = map seqSequence sl -- Rad (iii)
+      
+      tmp1 = map (map (\x -> ((head x), (length x))) . group . sort)
+      (transpose strs) -- Rad (iv)
+      equalFst a b = (fst a) == (fst b)
+      res = map sort (map (\l -> unionBy equalFst l defaults) tmp1)
+
+data Profile = Profile {profileName :: String, matrix :: Matrix, sequenceType :: seqType, numOfSeqs :: Int}
+
+molseqs2profile :: String -> [MolSeq] -> Profile
+molseqs2profile s mols = 
+   | isDNA head mols = Profile s makeProfileMatrix mols DNA length mols
+   | otherwise = Profile s makeProfileMatrix mols Protein length mols
+
+profileName :: Profile -> String
+profileName (Profile name _ _ _) = name
+
+profileFrequency :: Profile -> Int -> Char -> Double
+-- TODO fixa så att:
+-- profil p, en heltalsposition i, och ett tecken c, och returnerar den relativa frekvensen för tecken c på position i i profilen p 
+profileFrequency (Profile _ matrix _ _) index char = getElem 
+
+
+profileDistance :: Profile -> Profile -> Double
+-- TODO beräkna avstånd mellan profilerna
