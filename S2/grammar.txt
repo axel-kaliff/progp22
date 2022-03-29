@@ -1,0 +1,31 @@
+### Terminals ###
+<forw>
+<back>
+<left>
+<right>
+<up>
+<down>
+<color>
+<rep>
+
+<period>
+<quote>
+
+<decimal>
+<hex>
+
+<error>
+
+### Non-terminals ###
+
+<program>   ::= <block>
+
+<block>     ::= <command> <block> | <reps> <block> | <comment> <block> | ""
+            
+<command>   ::= <forw> <decimal> <period> | <back> <decimal> <period> | <left> <decimal> <period> 
+                | <right> <decimal> <period> | <down> <period> | <up> <period> 
+                | <color> <hex> <period>
+
+<reps>      ::= <rep> <decimal> <quote> <block> <quote>
+
+
