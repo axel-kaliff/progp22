@@ -85,7 +85,7 @@ makeProfileMatrix sl = res
       equalFst a b = (fst a) == (fst b)
       res = map sort (map (\l -> unionBy equalFst l defaults) tmp1)
 
-data Profile = Profile {name :: String, matrix :: [[(Char, Int)]], sequencType :: SeqType, numOfSeqs :: Int}
+data Profile = Profile {profName :: String, matrix :: [[(Char, Int)]], sequencType :: SeqType, numOfSeqs :: Int}
 
 molseqs2profile :: String -> [MolSeq] -> Profile
 molseqs2profile s mols 
@@ -112,3 +112,34 @@ profileDistance profile1 profile2
     | profileType profile1  == DNA = sum [abs ((profileFrequency profile1 x y) - (profileFrequency profile2 x y) )| y <- nucleotides, x <- [0..(profileSeqLength profile1)-1]]
     | otherwise = sum [abs ((profileFrequency profile1 x y) - (profileFrequency profile2 x y) )| y <- aminoacids, x <- [0..(profileSeqLength profile1)-1]]
 
+
+---- 4 Generell beräkning av avstandsmatriser ----
+
+class Evol a where
+    getName :: a -> String
+
+    distanceMatrix :: [a] -> [(String, String, Double)]
+
+    getTriple :: a -> a -> (String, String, Double)
+
+    getDistance :: a -> a -> Double
+
+instance Evol MolSeq where
+    getName a = seqName a
+
+    distanceMatrix [] = []
+    distanceMatrix x = map (getTriple (head x)) x  ++ distanceMatrix (tail x) 
+
+    getTriple x y = (getName x, getName y, getDistance x y)
+
+    getDistance x y = seqDistance x y
+
+instance Evol Profile where
+    getName a = profileName a
+
+    distanceMatrix [] = []
+    distanceMatrix x = map (getTriple (head x)) x  ++ distanceMatrix (tail x) 
+
+    getTriple x y = (getName x, getName y, getDistance x y)
+
+    getDistance x y = profileDistance x y
