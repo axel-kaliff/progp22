@@ -1,5 +1,6 @@
-BACK 90. UP. DOWN.
-
-
-BACK 10. .       jfd 
-
+DOWN.
+FORW 10. LEFT 90.
+FORW 1. LEFT 90.
+% this is a comment
+FORW 1. LEFT 90. % and this is a comment
+FORW 1. LEFT 90.
