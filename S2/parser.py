@@ -25,158 +25,152 @@ class Token:
         self.row = row
         self.value = value
 
-def main():
-
-    tokens = []
+    def tokenize(file):
+        tokens = []
     
-    with open('data.txt') as f:
-         
-        buffer = "" 
-        last_c = ""
-        numBuffer = ""
-        hexActive= False
-        commentLine = False
-        row = 1
-        
-        while True:
+        with open(file) as f:
              
-            # Read from file
-            c = f.read(1)
-               
-            # detect comment
-            if c == "%":
-                commentLine = True
-                row = row + 1
+            buffer = "" 
+            last_c = ""
+            numBuffer = ""
+            hexActive= False
+            commentLine = False
+            row = 1
+            
+            while True:
+                 
+                # Read from file
+                c = f.read(1)
+                   
+                # detect comment
+                if c == "%":
+                    commentLine = True
+                    row = row + 1
 
-            if commentLine:
+                if commentLine:
+                    if c == "\n":
+                         commentLine = False
+                         continue
+                    else: 
+                        continue
+                        
+
+
                 if c == "\n":
-                     commentLine = False
-                     continue
-                else: 
+                    row = row + 1
+
+                # all whitespace is equal
+                if "\n" in c or "\t" in c:
+                    c = " "
+
+                if c == " " and last_c == ".":
+                    # TODO should this be continue?
                     continue
+                    # c == ""
+
+                if last_c == "." and (" " in c or "\n" in c or "\t" in c):
+                    buffer = ""
                     
 
+               
 
-            if c == "\n":
-                row = row + 1
+                # does not add repeating whitespace or whitespace after period
+                # TODO it still adds redundant whitespaces
+                if not ((last_c == " ") and (c == " ")) and not (last_c == "." and c == " "):
+                    buffer = buffer + c
+                    
 
-            # all whitespace is equal
-            if "\n" in c or "\t" in c:
-                c = " "
+                # check if buffer matches any tokens
+                if buffer == "." or buffer == " .":
 
-            if c == " " and last_c == ".":
-                # TODO should this be continue?
-                continue
-                # c == ""
+                    if not numBuffer == "":
+                        tokens.append(Token(TokenClass.DECIMAL, row, numBuffer))
+                        numBuffer = ""
 
-            if last_c == "." and (" " in c or "\n" in c or "\t" in c):
-                buffer = ""
-                
-
-           
-
-            # does not add repeating whitespace or whitespace after period
-            # TODO it still adds redundant whitespaces
-            if not ((last_c == " ") and (c == " ")) and not (last_c == "." and c == " "):
-                buffer = buffer + c
-                
-
-            # check if buffer matches any tokens
-            if buffer == "." or buffer == " .":
-
-                if not numBuffer == "":
-                    tokens.append(Token(TokenClass.DECIMAL, row, numBuffer))
-                    numBuffer = ""
-
-                tokens.append(Token(TokenClass.PERIOD, row, numBuffer))
-                buffer = ""
-
-            if buffer == "FORW " or buffer == " FORW ":
-                tokens.append(Token(TokenClass.FORW, row, buffer))
-                buffer = ""
-
-            if buffer == "\"" or buffer == " \"":
-                if not numBuffer == "":
-                    tokens.append(Token(TokenClass.DECIMAL, row, buffer))
-                    numBuffer = ""
-
-
-                tokens.append(Token(TokenClass.QUOTE, row, buffer))
-                buffer = ""
-                
-            if buffer == "REP " or buffer == " REP ":
-                tokens.append(Token(TokenClass.REP, row, buffer))
-                buffer = ""
-
-
-
-
-            if buffer == "LEFT " or buffer == " LEFT ":
-                tokens.append(Token(TokenClass.LEFT, row, buffer))
-                buffer = ""
-
-            if buffer == "RIGHT " or buffer == " RIGHT ":
-                tokens.append(Token(TokenClass.RIGHT, row, buffer))
-                buffer = ""
-
-
-            if buffer == "BACK " or buffer == " BACK ":
-                tokens.append(Token(TokenClass.BACK, row, buffer))
-                buffer = ""
-
-            if buffer.strip() == "UP":
-                tokens.append(Token(TokenClass.UP, row, buffer))
-                buffer = ""
-
-            if buffer == "DOWN":
-                tokens.append(Token(TokenClass.DOWN, row, buffer))
-                buffer = ""
-
-            if buffer== "#":
-                hexActive = True
-
-            if re.findall("#[0-9a-fA-F]+", buffer):
-                tokens.append(Token(TokenClass.HEX, row, buffer))
-                hexActive = False
-                buffer = ""
-
-            if c.isnumeric() and not hexActive:
-                numBuffer = numBuffer + c
-                buffer = ""
-
-        
-
-
-            if not (buffer == "" or buffer == " ") and not numBuffer == "":
-                tokens.append(Token(TokenClass.DECIMAL, row, buffer))
-                numBuffer = ""
-
-
-
-            # if there has been some sort of command
-            if c == " " and not (buffer == "" or buffer == " "):
-                # if there's a whitespace after something that wasn't a command (becuase the buffer would have been reset if it was)
-
-                if not numBuffer == "":
-                    tokens.append(Token(TokenClass.DECIMAL, row, buffer))
-                    numBuffer = ""
-
-                # TODO hex
-                else:
-                    tokens.append(Token(TokenClass.ERROR, row, buffer))
+                    tokens.append(Token(TokenClass.PERIOD, row, numBuffer))
                     buffer = ""
 
-            last_c = c
-            if not c:
-                break
-         
-    # print(tokens)
-        print("***************** TEST **************")
-    for token in tokens:
+                if buffer == "FORW " or buffer == " FORW ":
+                    tokens.append(Token(TokenClass.FORW, row, buffer))
+                    buffer = ""
 
-        print(token.row)
+                if buffer == "\"" or buffer == " \"":
+                    if not numBuffer == "":
+                        tokens.append(Token(TokenClass.DECIMAL, row, buffer))
+                        numBuffer = ""
 
 
-if __name__=="__main__":
-    main()
+                    tokens.append(Token(TokenClass.QUOTE, row, buffer))
+                    buffer = ""
+                    
+                if buffer == "REP " or buffer == " REP ":
+                    tokens.append(Token(TokenClass.REP, row, buffer))
+                    buffer = ""
+
+
+
+
+                if buffer == "LEFT " or buffer == " LEFT ":
+                    tokens.append(Token(TokenClass.LEFT, row, buffer))
+                    buffer = ""
+
+                if buffer == "RIGHT " or buffer == " RIGHT ":
+                    tokens.append(Token(TokenClass.RIGHT, row, buffer))
+                    buffer = ""
+
+
+                if buffer == "BACK " or buffer == " BACK ":
+                    tokens.append(Token(TokenClass.BACK, row, buffer))
+                    buffer = ""
+
+                if buffer.strip() == "UP":
+                    tokens.append(Token(TokenClass.UP, row, buffer))
+                    buffer = ""
+
+                if buffer == "DOWN":
+                    tokens.append(Token(TokenClass.DOWN, row, buffer))
+                    buffer = ""
+
+                if buffer== "#":
+                    hexActive = True
+
+                if re.findall("#[0-9a-fA-F]+", buffer):
+                    tokens.append(Token(TokenClass.HEX, row, buffer))
+                    hexActive = False
+                    buffer = ""
+
+                if c.isnumeric() and not hexActive:
+                    numBuffer = numBuffer + c
+                    buffer = ""
+
+            
+
+
+                if not (buffer == "" or buffer == " ") and not numBuffer == "":
+                    tokens.append(Token(TokenClass.DECIMAL, row, buffer))
+                    numBuffer = ""
+
+
+
+                # if there has been some sort of command
+                if c == " " and not (buffer == "" or buffer == " "):
+                    # if there's a whitespace after something that wasn't a command (becuase the buffer would have been reset if it was)
+
+                    if not numBuffer == "":
+                        tokens.append(Token(TokenClass.DECIMAL, row, buffer))
+                        numBuffer = ""
+
+                    # TODO hex
+                    else:
+                        tokens.append(Token(TokenClass.ERROR, row, buffer))
+                        buffer = ""
+
+                last_c = c
+                if not c:
+                    break
+             
+        # print(tokens)
+        return tokens
+
+
 
