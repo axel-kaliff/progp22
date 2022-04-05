@@ -2,6 +2,7 @@
 
 from binarytree import Node
 import enum
+from parser import Lexer, Token, TokenClass
 
 
 # TODO Have to rewrite to work with new structure of tokens
@@ -9,11 +10,12 @@ import enum
 
 # The needed global variables, fix later TODO
 
+FILE_PATH = "./data.txt"
+
 global current_index
+global token_array
+global NO_TOKENS
 
-token_array = [Tokens.DOWN, Tokens.PERIOD, Tokens.REP, Tokens.DECIMAL, Tokens.QUOTE, Tokens.COLOR, Tokens.HEX, Tokens.PERIOD, Tokens.REP, Tokens.DECIMAL, Tokens.QUOTE, Tokens.DOWN, Tokens.PERIOD, Tokens.QUOTE, Tokens.FORW, Tokens.DECIMAL, Tokens.PERIOD, Tokens.QUOTE]
-
-NO_TOKENS = len(token_array)
 
 #### Functions used for parsing ####
 
@@ -47,7 +49,7 @@ def error(row):
 
 
 
-#### One function for each non-terminal ####
+#### Functions for all non-terminals ####
 
 # Returns a reps-node with the number of reps as its left child and the 
 # block to repeat as its right child
@@ -73,7 +75,8 @@ def command():
 
     node = None 
 
-    type = get_next_token().tokentype
+    next_token = get_next_token()
+    type = next_token.tokenclass
 
     if type == TokenClass.FORW:
         node = Node("forw")
@@ -96,7 +99,8 @@ def command():
         node.left = Node(expect(TokenClass.HEX))
     else:
         print(f"DEBUG not correct token for command")
-        error(fixlater)
+        print(f"DEBUG current token: {type}")
+        error(next_token.row)
 
     expect(TokenClass.PERIOD)
 
@@ -116,6 +120,9 @@ def block():
             node.left = reps()
         elif next_token == TokenClass.QUOTE:
             return node
+        elif next_token == TokenClass.ERROR:
+            print(f"DEBUG found error-token")
+            error(get_next_token().row)
         else:
             node.left = command()
 
@@ -128,7 +135,14 @@ def block():
 def main():
 
     global current_index
+    global token_array
+    global NO_TOKENS
+
     current_index = -1
+
+    token_array = Lexer.tokenize(FILE_PATH)
+    NO_TOKENS = len(token_array)
+
     root = block()
     print(root)
 
