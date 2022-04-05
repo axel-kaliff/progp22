@@ -120,11 +120,9 @@ class Lexer:
                     tokens.append(Token(TokenClass.RIGHT, row, buffer))
                     buffer = ""
 
-                if buffer == "COLOR" or buffer == " COLOR ":
+                if buffer == "COLOR " or buffer == " COLOR ":
                     tokens.append(Token(TokenClass.COLOR, row, buffer))
                     buffer = ""
-
-
 
                 if buffer == "BACK " or buffer == " BACK ":
                     tokens.append(Token(TokenClass.BACK, row, buffer))
@@ -141,7 +139,7 @@ class Lexer:
                 if buffer== "#":
                     hexActive = True
 
-                if re.findall("^#([A-Fa-f0-9]{6})$", buffer):
+                if re.findall("^#([A-Fa-f0-9]{6})", buffer):
                     tokens.append(Token(TokenClass.HEX, row, buffer))
                     hexActive = False
                     buffer = ""
