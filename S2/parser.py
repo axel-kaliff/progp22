@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import enum
+import re
  # Using enum class create enumerations
-class Tokens(enum.Enum):
+class TokenClass(enum.Enum):
    ERROR = 0
    FORW = 1
    BACK = 2
@@ -18,6 +19,12 @@ class Tokens(enum.Enum):
    HEX = 11
    LEFT = 12
 
+class Token:
+    def __init__(self, tokenclass, row, value):
+        self.tokenclass = tokenclass
+        self.row = row
+        self.value = value
+
 def main():
 
     tokens = []
@@ -27,8 +34,9 @@ def main():
         buffer = "" 
         last_c = ""
         numBuffer = ""
-        hexBuffer = ""
+        hexActive= False
         commentLine = False
+        row = 1
         
         while True:
              
@@ -38,23 +46,28 @@ def main():
             # detect comment
             if c == "%":
                 commentLine = True
+                row = row + 1
 
             if commentLine:
                 if c == "\n":
                      commentLine = False
                      continue
                 else: 
-                     continue
+                    continue
                     
 
 
+            if c == "\n":
+                row = row + 1
 
             # all whitespace is equal
             if "\n" in c or "\t" in c:
                 c = " "
 
             if c == " " and last_c == ".":
-                c == ""
+                # TODO should this be continue?
+                continue
+                # c == ""
 
             if last_c == "." and (" " in c or "\n" in c or "\t" in c):
                 buffer = ""
@@ -63,73 +76,94 @@ def main():
            
 
             # does not add repeating whitespace or whitespace after period
-            if not ((last_c == " ") and (c == " ")) or not (last_c == "." and c == " "):
+            # TODO it still adds redundant whitespaces
+            if not ((last_c == " ") and (c == " ")) and not (last_c == "." and c == " "):
                 buffer = buffer + c
                 
 
             # check if buffer matches any tokens
-            if buffer == ".":
+            if buffer == "." or buffer == " .":
 
                 if not numBuffer == "":
-                    tokens.append(Tokens.DECIMAL)
+                    tokens.append(Token(TokenClass.DECIMAL, row, numBuffer))
                     numBuffer = ""
-                if not hexBuffer == "":
-                    tokens.append(Tokens.HEX)
-                    hexBuffer = ""
 
-                tokens.append(Tokens.PERIOD)
+                tokens.append(Token(TokenClass.PERIOD, row, numBuffer))
                 buffer = ""
 
             if buffer == "FORW " or buffer == " FORW ":
-                tokens.append(Tokens.FORW)
+                tokens.append(Token(TokenClass.FORW, row, buffer))
                 buffer = ""
 
+            if buffer == "\"" or buffer == " \"":
+                if not numBuffer == "":
+                    tokens.append(Token(TokenClass.DECIMAL, row, buffer))
+                    numBuffer = ""
+
+
+                tokens.append(Token(TokenClass.QUOTE, row, buffer))
+                buffer = ""
+                
+            if buffer == "REP " or buffer == " REP ":
+                tokens.append(Token(TokenClass.REP, row, buffer))
+                buffer = ""
+
+
+
+
             if buffer == "LEFT " or buffer == " LEFT ":
-                tokens.append(Tokens.LEFT)
+                tokens.append(Token(TokenClass.LEFT, row, buffer))
                 buffer = ""
 
             if buffer == "RIGHT " or buffer == " RIGHT ":
-                tokens.append(Tokens.RIGHT)
+                tokens.append(Token(TokenClass.RIGHT, row, buffer))
                 buffer = ""
 
 
             if buffer == "BACK " or buffer == " BACK ":
-                tokens.append(Tokens.BACK)
+                tokens.append(Token(TokenClass.BACK, row, buffer))
                 buffer = ""
 
             if buffer.strip() == "UP":
-                tokens.append(Tokens.UP)
+                tokens.append(Token(TokenClass.UP, row, buffer))
                 buffer = ""
 
             if buffer == "DOWN":
-                tokens.append(Tokens.DOWN)
+                tokens.append(Token(TokenClass.DOWN, row, buffer))
                 buffer = ""
 
-            if c.isnumeric():
+            if buffer== "#":
+                hexActive = True
+
+            if re.findall("#[0-9a-fA-F]+", buffer):
+                tokens.append(Token(TokenClass.HEX, row, buffer))
+                hexActive = False
+                buffer = ""
+
+            if c.isnumeric() and not hexActive:
                 numBuffer = numBuffer + c
                 buffer = ""
 
-            # TODO hex
-            
+        
+
+
+            if not (buffer == "" or buffer == " ") and not numBuffer == "":
+                tokens.append(Token(TokenClass.DECIMAL, row, buffer))
+                numBuffer = ""
 
 
 
             # if there has been some sort of command
-            if (c == " " or c == "\n") and not (buffer == "" or buffer == " " or buffer == "\n"):
+            if c == " " and not (buffer == "" or buffer == " "):
                 # if there's a whitespace after something that wasn't a command (becuase the buffer would have been reset if it was)
 
-                # might have been a number or hex
-
-                if not numBuffer == "" and not c.isnumeric():
-                    tokens.append(Tokens.DECIMAL)
+                if not numBuffer == "":
+                    tokens.append(Token(TokenClass.DECIMAL, row, buffer))
                     numBuffer = ""
 
                 # TODO hex
                 else:
-                    print("e: ")
-                    print("'" + buffer + "'")
-
-                    tokens.append(Tokens.ERROR)
+                    tokens.append(Token(TokenClass.ERROR, row, buffer))
                     buffer = ""
 
             last_c = c
@@ -137,10 +171,11 @@ def main():
                 break
          
     # print(tokens)
-    print("##################################")
+        print("***************** TEST **************")
     for token in tokens:
-        print(token)
-        print(" ")
+
+        print(token.row)
+
 
 if __name__=="__main__":
     main()
