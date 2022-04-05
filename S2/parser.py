@@ -25,6 +25,8 @@ class Token:
         self.row = row
         self.value = value
 
+class Lexer:
+
     def tokenize(file):
         tokens = []
     
