@@ -20,7 +20,7 @@
 
 <program>   ::= <block>
 
-<block>     ::= <command> <block> | <reps> <block> | <comment> <block> | ""
+<block>     ::= <command> <block> | <reps> <block> |  ""
             
 <command>   ::= <forw> <decimal> <period> | <back> <decimal> <period> | <left> <decimal> <period> 
                 | <right> <decimal> <period> | <down> <period> | <up> <period> 
