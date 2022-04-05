@@ -89,7 +89,7 @@ class Lexer:
                         tokens.append(Token(TokenClass.DECIMAL, row, numBuffer))
                         numBuffer = ""
 
-                    tokens.append(Token(TokenClass.PERIOD, row, numBuffer))
+                    tokens.append(Token(TokenClass.PERIOD, row, buffer))
                     buffer = ""
 
                 if buffer == "FORW " or buffer == " FORW ":
@@ -98,7 +98,7 @@ class Lexer:
 
                 if buffer == "\"" or buffer == " \"":
                     if not numBuffer == "":
-                        tokens.append(Token(TokenClass.DECIMAL, row, buffer))
+                        tokens.append(Token(TokenClass.DECIMAL, row, numBuffer))
                         numBuffer = ""
 
 
@@ -149,7 +149,7 @@ class Lexer:
 
 
                 if not (buffer == "" or buffer == " ") and not numBuffer == "":
-                    tokens.append(Token(TokenClass.DECIMAL, row, buffer))
+                    tokens.append(Token(TokenClass.DECIMAL, row, numBuffer))
                     numBuffer = ""
 
 
@@ -159,7 +159,7 @@ class Lexer:
                     # if there's a whitespace after something that wasn't a command (becuase the buffer would have been reset if it was)
 
                     if not numBuffer == "":
-                        tokens.append(Token(TokenClass.DECIMAL, row, buffer))
+                        tokens.append(Token(TokenClass.DECIMAL, row, numBuffer))
                         numBuffer = ""
 
                     # TODO hex
