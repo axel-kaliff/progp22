@@ -1,7 +1,6 @@
 # Whole program builds a parse-tree for the sequence of tokens
 
 from binarytree import Node
-import enum
 from parser import Lexer, Token, TokenClass
 
 
@@ -26,10 +25,15 @@ def get_next_token():
     current_index += 1
     if current_index == NO_TOKENS:
         print(f"DEBUG current index too high")
-        error(fixlater)
+        error(token_array[current_index-1].row)
+
+    print(f" ")
+    print(f"DEBUG tokenclass = {token_array[current_index].tokenclass}")
+    print(f"DEBUG value = {token_array[current_index].value}")
+    print(f"DEBUG row = {token_array[current_index].row}")
     return token_array[current_index]
 
-def peak_next_token():
+def peek_next_token():
 
     return token_array[current_index+1].tokenclass
 
@@ -37,7 +41,8 @@ def expect(expected_token):
 
     next_token = get_next_token()
     if next_token.tokenclass != expected_token:
-        print(f"DEBUG unexpected token, expected {expected_token.tokenclass}, got {next_token}")
+        print(f"DEBUG unexpected token, expected {expected_token}, got {next_token.tokenclass}")
+        print(f"DEBUG value: {next_token.value}")
         error(next_token.row)
     else:
         return next_token.value
@@ -56,15 +61,23 @@ def error(row):
 def reps():
 
     get_next_token() #Remove the reps-token
+    node = Node("reps")
     
-    node = Node ("reps")
     node.left = Node(expect(TokenClass.DECIMAL))
 
-    expect(TokenClass.QUOTE)
+    
+    next_token = peek_next_token()
 
-    node.right = block()
+    if next_token == TokenClass.REP:
+        node.right = reps()
+    elif next_token == TokenClass.QUOTE:
+        get_next_token() 
 
-    expect(TokenClass.QUOTE)
+        node.right = block()
+
+        expect(TokenClass.QUOTE)
+    else:
+        node.right = command()
 
     return node
 
@@ -100,6 +113,7 @@ def command():
     else:
         print(f"DEBUG not correct token for command")
         print(f"DEBUG current token: {type}")
+        print(f"DEBUG current token value: {next_token.value}")
         error(next_token.row)
 
     expect(TokenClass.PERIOD)
@@ -115,7 +129,7 @@ def block():
 
     global current_index
     if current_index < NO_TOKENS-1:
-        next_token = peak_next_token()
+        next_token = peek_next_token()
         if next_token == TokenClass.REP:
             node.left = reps()
         elif next_token == TokenClass.QUOTE:
