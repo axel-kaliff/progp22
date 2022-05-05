@@ -1,8 +1,10 @@
 # Whole program builds a parse-tree for the sequence of tokens
 
-from binarytree import Node
 from parser import Lexer, Token, TokenClass
 from leona import Leona
+from node import Node
+
+import sys
 
 
 # TODO Have to rewrite to work with new structure of tokens
@@ -25,13 +27,13 @@ def get_next_token():
 
     current_index += 1
     if current_index == NO_TOKENS:
-        print(f"DEBUG current index too high")
+#        print(f"DEBUG current index too high")
         error(token_array[current_index-1].row)
 
-    print(f" ")
-    print(f"DEBUG tokenclass = {token_array[current_index].tokenclass}")
-    print(f"DEBUG value = {token_array[current_index].value}")
-    print(f"DEBUG row = {token_array[current_index].row}")
+#    print(f" ")
+#    print(f"DEBUG tokenclass = {token_array[current_index].tokenclass}")
+#    print(f"DEBUG value = {token_array[current_index].value}")
+#    print(f"DEBUG row = {token_array[current_index].row}")
     return token_array[current_index]
 
 def peek_next_token():
@@ -42,15 +44,15 @@ def expect(expected_token):
 
     next_token = get_next_token()
     if next_token.tokenclass != expected_token:
-        print(f"DEBUG unexpected token, expected {expected_token}, got {next_token.tokenclass}")
-        print(f"DEBUG value: {next_token.value}")
+#        print(f"DEBUG unexpected token, expected {expected_token}, got {next_token.tokenclass}")
+#        print(f"DEBUG value: {next_token.value}")
         error(next_token.row)
     else:
         return next_token.value
 
 def error(row):
 
-    print(f"Syntaxfel på rad {row}")
+    sys.stdout.write(f"Syntaxfel på rad {row} \n")
     quit()
 
 
@@ -112,9 +114,9 @@ def command():
         node = Node("color")
         node.left = Node(expect(TokenClass.HEX))
     else:
-        print(f"DEBUG not correct token for command")
-        print(f"DEBUG current token: {type}")
-        print(f"DEBUG current token value: {next_token.value}")
+#        print(f"DEBUG not correct token for command")
+#        print(f"DEBUG current token: {type}")
+#        print(f"DEBUG current token value: {next_token.value}")
         error(next_token.row)
 
     expect(TokenClass.PERIOD)
@@ -136,7 +138,7 @@ def block():
         elif next_token == TokenClass.QUOTE:
             return node
         elif next_token == TokenClass.ERROR:
-            print(f"DEBUG found error-token")
+#            print(f"DEBUG found error-token")
             error(get_next_token().row)
         else:
             node.left = command()
@@ -155,7 +157,13 @@ def main():
 
     current_index = -1
 
-    input_text = [] #TODO fix this shit
+    input_lines = [] #TODO fix this shit
+
+    for line in sys.stdin:
+        input_lines.append(line)
+
+    input_text = ''.join(input_lines)
+#    print(input_text)
     token_array = Lexer.tokenize(input_text)
     NO_TOKENS = len(token_array)
 

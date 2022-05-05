@@ -1,5 +1,6 @@
-from binarytree import Node
+from node import Node
 import math
+import sys
 
 
 class Leona:
@@ -26,8 +27,9 @@ class Leona:
         to_draw.append("{:.4f}".format(self.position[1]))
         to_draw.append("{:.4f}".format(end_position[0]))
         to_draw.append("{:.4f}".format(end_position[1]))
+        to_draw.append('\n')
         
-        print(' '.join(to_draw))
+        sys.stdout.write(' '.join(to_draw))
 
 
 
