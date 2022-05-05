@@ -2,6 +2,7 @@
 
 from binarytree import Node
 from parser import Lexer, Token, TokenClass
+from leona import Leona
 
 
 # TODO Have to rewrite to work with new structure of tokens
@@ -154,12 +155,15 @@ def main():
 
     current_index = -1
 
-    token_array = Lexer.tokenize(FILE_PATH)
+    input_text = [] #TODO fix this shit
+    token_array = Lexer.tokenize(input_text)
     NO_TOKENS = len(token_array)
 
     root = block()
-    print(root)
+#    print(root)
 
+    leona = Leona()
+    leona.read_node(root)
 
 
 if __name__=="__main__":
