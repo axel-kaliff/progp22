@@ -21,19 +21,24 @@ class Leona:
     # Write coordinates with at least 4 decimals
     def draw(self, end_position):
         
+
+        # TODO kanske kolla att allt blir bra utan negativa nollor?
         to_draw = []
         to_draw.append(self.color)
         to_draw.append("{:.4f}".format(self.position[0]))
         to_draw.append("{:.4f}".format(self.position[1]))
-        to_draw.append("{:.4f}".format(end_position[0]))
+        if end_position[0] > -0.00001 and end_position[0] < 0:
+            to_draw.append("{:.4f}".format(-end_position[0]))
+        else:
+            to_draw.append("{:.4f}".format(end_position[0]))
         to_draw.append("{:.4f}".format(end_position[1]))
-        to_draw.append('\n')
+
         
         sys.stdout.write(' '.join(to_draw))
+        sys.stdout.write('\n')
 
 
 
-    # TODO måste vi hålla koll på om en går utanför ett visst område?
     def move(self, distance):
 
         new_position = self.calculate_new_position(distance)
@@ -48,10 +53,6 @@ class Leona:
 
     def calculate_new_position(self, distance):
 
-        # TODO labbeskrivning säger i "rikning v antal grader moturs från rakt högerut"
-        #      men direction är från rakt norrut
-        # Have to change?
-        # TODO check are these actually doubles?
         x = self.position[0] + distance * math.cos(math.pi * self.direction / 180)
         y = self.position[1] + distance * math.sin(math.pi * self.direction / 180)
 
@@ -60,8 +61,6 @@ class Leona:
 
     ### Functions for navigating tree ###
 
-
-    # TODO skrivs error in här? Eller tas det han om tidigare?
 
     def read_node(self, node):
         

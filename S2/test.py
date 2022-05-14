@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import sys
+import enum
+import re
 
 from parser import Lexer, Token, TokenClass
+from leona import Leona
+from node import Node
 
-l = Lexer()
-
-
-for token in Lexer.tokenize("data.txt"):
-    print(token.row)
-    print(token.value)
-    print("\n")
+print("TEST")
