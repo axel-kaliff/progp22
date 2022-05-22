@@ -1,8 +1,9 @@
 import socket
+import sys
 
 class Client:
 
-    def __init__(self, server):
+    def __init__(self, server="192.168.1.124"):
 
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -36,8 +37,10 @@ def main():
 
     print(client.connect())
 
-    client.send("hi")
-    client.send("ho")
+    while True:
+        if input() == "o":
+            client.send("hi")
+            client.send("ho")
 
 
 if __name__ == "__main__":
