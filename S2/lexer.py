@@ -33,6 +33,7 @@ class Lexer:
                 self.tokens.append(Token(tokenClass, self.row, self.buffer))
             self.buffer = ""
 
+
     def checkBufferForToken(self):
 
         if re.findall(r'^([\s])*FORW([\s])+$', self.buffer):
@@ -81,12 +82,6 @@ class Lexer:
 
         if self.commentLine:
             if self.c == "\n":
-                #self.buffer = self.buffer + " "
-                #self.checkBufferForToken()
-                #self.handleWhitespace()
-#                print('%s buffer from comment' % self.buffer)
-                #self.row = self.row + 1
-                #self.buffer = ""
                 self.commentLine = False
                 return True
             else:
@@ -111,23 +106,14 @@ class Lexer:
             idx = idx + 1
 
             self.c = self.c.upper()
-            #if not self.handleComments():
-                #if self.c == "\n":
-                #    print('%s buffer' % self.buffer)
-                #    if not self.commentLine:
-                #        self.row = self.row + 1
-            #    self.buffer = self.buffer + self.c
-
             self.handleComments()
 
             if self.c == "\n":
                 if not re.findall(r'^([\s])+$', self.buffer):
-                    #                   print("buffer: '%s' at %s" % (self.buffer, self.row))
                     self.buffer = self.buffer + " "
                     self.checkBufferForToken()
                     self.handleWhitespace()
                 self.row = self.row + 1
-
 
             if not self.commentLine:
                 self.buffer = self.buffer + self.c
@@ -136,7 +122,6 @@ class Lexer:
                 self.handleWhitespace()
 
             if len(self.buffer.strip()) > 7:
-                #print(self.buffer)
                 self.addToken(TokenClass.ERROR, False)
 
             if not self.c:
