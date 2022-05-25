@@ -1,4 +1,5 @@
 import re
+import sys
 from tokenprogp import Token
 from tokenclass import TokenClass
 
@@ -96,39 +97,49 @@ class Lexer:
                 if re.findall(r'^([\s])+$', self.c) and not re.findall(r'^([\s])+$', self.buffer):
                     self.addToken(TokenClass.ERROR, False)
 
-    def tokenize(self, text):
+    def tokenize(self, text1):
 
-        idx = 0
+        for text in sys.stdin:
+            #input_lines.append(line)
 
-        while idx < len(text):
-            self.c = text[idx]
-            idx = idx + 1
+            idx = 0
 
-            self.c = self.c.upper()
-            self.handleComments()
+            while idx < len(text):
+                self.c = text[idx]
+                idx = idx + 1
 
-            if self.c == "\n":
-                if not re.findall(r'^([\s])+$', self.buffer):
-                    self.buffer = self.buffer + " "
-                    self.checkBufferForToken()
-                    self.handleWhitespace()
-                self.row = self.row + 1
+                self.c = self.c.upper()
+                self.handleComments()
 
-            if not self.commentLine:
+                if self.c == "\n" or self.commentLine:
+                    if not re.findall(r'^([\s])+$', self.buffer):
+                        self.buffer = self.buffer + " "
+                        self.checkBufferForToken()
+                        self.handleWhitespace()
+                    self.row = self.row + 1
+                    if self.commentLine:
+                        text = ""
+                        self.commentLine = False
+                        continue
+                        
+                        
+
+                
                 self.buffer = self.buffer + self.c
                 self.result = None
                 self.checkBufferForToken()
                 self.handleWhitespace()
                 if not re.findall(r"^([\s]|#|([A-Za-z0-9])|([0-9])|(\.)|(\"))$", self.c):
-                    #print("buffer: %s" % self.c)
+                   #print("buffer: %s" % self.c)
+                   self.addToken(TokenClass.ERROR, False)
+                   continue
+
+
+                if len(self.buffer.strip()) > 7:
                     self.addToken(TokenClass.ERROR, False)
-                    continue
 
+                if not self.c:
+                    break
 
-            if len(self.buffer.strip()) > 7:
-                self.addToken(TokenClass.ERROR, False)
-
-            if not self.c:
-                break
-
+        
         return self.tokens
