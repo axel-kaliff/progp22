@@ -2,7 +2,6 @@ import re
 from tokenprogp import Token
 from tokenclass import TokenClass
 
-
 class Lexer:
     c = ""
     buffer = ""
@@ -120,6 +119,11 @@ class Lexer:
                 self.result = None
                 self.checkBufferForToken()
                 self.handleWhitespace()
+                if not re.findall(r"^([\s]|#|([A-Za-z0-9])|([0-9])|(\.)|(\"))$", self.c):
+                    #print("buffer: %s" % self.c)
+                    self.addToken(TokenClass.ERROR, False)
+                    continue
+
 
             if len(self.buffer.strip()) > 7:
                 self.addToken(TokenClass.ERROR, False)
@@ -127,6 +131,4 @@ class Lexer:
             if not self.c:
                 break
 
-#        for token in self.tokens:
-#            print("%s: %s || %s" % (token.row, token.tokenclass, token.value))
         return self.tokens
