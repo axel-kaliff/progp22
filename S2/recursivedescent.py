@@ -24,13 +24,13 @@ class RecursiveDescent:
 
         self.current_index = -1
 
-    #### Functions used for parsing ####
+    # Functions used for parsing ####
 
     def get_next_token(self):
 
         self.current_index += 1
         if self.current_index == self.NO_TOKENS:
-            error(self.token_array[self.current_index-1].row)
+            self.error(self.token_array[self.current_index-1].row)
 
         return self.token_array[self.current_index]
 
@@ -42,7 +42,7 @@ class RecursiveDescent:
 
         next_token = self.get_next_token()
         if next_token.tokenclass != expected_token:
-            error(next_token.row)
+            self.error(next_token.row)
         else:
             return next_token.value
 
@@ -128,14 +128,13 @@ class RecursiveDescent:
             elif next_token == TokenClass.QUOTE:
                 return node
             elif next_token == TokenClass.ERROR:
-                self.error(get_next_token().row)
+                self.error(self.get_next_token().row)
             else:
                 node.left = self.command()
 
             node.right = self.block()
 
         return node
-        
 
 
 def main():
@@ -145,11 +144,10 @@ def main():
     for line in sys.stdin:
         input_lines.append(line)
 
-
-
     input_text = ''.join(input_lines)
+    lexer = Lexer()
 
-    token_array = Lexer.tokenize(input_text)
+    token_array = lexer.tokenize(input_text)
 
     rd = RecursiveDescent(token_array)
     root = rd.block()
@@ -159,4 +157,3 @@ def main():
 
 
 main()
-
