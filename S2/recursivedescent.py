@@ -141,10 +141,11 @@ def main():
 
     input_lines = [] 
 
-    for line in sys.stdin:
-        input_lines.append(line)
+    #for line in sys.stdin:
+    #    input_lines.append(line)
 
-    input_text = ''.join(input_lines)
+    #input_text = ''.join(input_lines)
+    input_text = " "
     lexer = Lexer()
 
     token_array = lexer.tokenize(input_text)
