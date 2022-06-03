@@ -71,10 +71,13 @@ class RecursiveDescent:
             node.right = self.reps()
         elif next_token == TokenClass.QUOTE:
             self.get_next_token() 
+            if self.current_index < self.NO_TOKENS-1 and self.peek_next_token() == TokenClass.QUOTE:
+                self.error(self.get_next_token().row)
 
-            node.right = self.block()
+            node.right = self.rep_block()
 
             self.expect(TokenClass.QUOTE)
+
         else:
             node.right = self.command()
 
@@ -125,6 +128,27 @@ class RecursiveDescent:
             next_token = self.peek_next_token()
             if next_token == TokenClass.REP:
                 node.left = self.reps()
+                if self.current_index < self.NO_TOKENS-1 and self.peek_next_token() == TokenClass.QUOTE:
+                    self.error(self.get_next_token().row)
+
+            elif next_token == TokenClass.QUOTE:
+                self.error(self.get_next_token().row)
+            elif next_token == TokenClass.ERROR:
+                self.error(self.get_next_token().row)
+            else:
+                node.left = self.command()
+
+            node.right = self.block()
+
+        return node
+
+    def rep_block(self):
+        node = Node("block")
+
+        if self.current_index < self.NO_TOKENS-1:
+            next_token = self.peek_next_token()
+            if next_token == TokenClass.REP:
+                node.left = self.reps()
             elif next_token == TokenClass.QUOTE:
                 return node
             elif next_token == TokenClass.ERROR:
@@ -132,7 +156,8 @@ class RecursiveDescent:
             else:
                 node.left = self.command()
 
-            node.right = self.block()
+            node.right = self.rep_block()
+
 
         return node
 
@@ -145,10 +170,13 @@ def main():
     #    input_lines.append(line)
 
     #input_text = ''.join(input_lines)
+
+    # Has been chanaged to read input in lexer!
     input_text = " "
     lexer = Lexer()
 
     token_array = lexer.tokenize(input_text)
+
 
     rd = RecursiveDescent(token_array)
     root = rd.block()
