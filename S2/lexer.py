@@ -21,16 +21,16 @@ class Lexer:
         self.result = tokenClass
         if number:
             if self.numBuffer[:1] == "0":
-                self.tokens.append(Token(TokenClass.ERROR, self.row, self.numBuffer))
+                self.tokens.append(Token(TokenClass.ERROR, self.row, self.numBuffer.strip()))
             else:
-                self.tokens.append(Token(tokenClass, self.row, self.numBuffer))
+                self.tokens.append(Token(tokenClass, self.row, self.numBuffer.strip()))
             self.numBuffer = ""
         else:
             if self.numBuffer:
                 self.numBuffer = ""
-                self.tokens.append(Token(TokenClass.ERROR, self.row, self.buffer))
+                self.tokens.append(Token(TokenClass.ERROR, self.row, self.buffer.strip()))
             else:
-                self.tokens.append(Token(tokenClass, self.row, self.buffer))
+                self.tokens.append(Token(tokenClass, self.row, self.buffer.strip()))
             self.buffer = ""
 
 

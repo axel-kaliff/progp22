@@ -1,9 +1,3 @@
-# Whole program builds a parse-tree for the sequence of tokens
-
-#from parser import Lexer, Token, TokenClass
-#from parser import Lexer
-#from parser import TokenClass
-#from parser import Token
 from leona import Leona
 from node import Node
 from tokenprogp import Token
@@ -157,8 +151,6 @@ class RecursiveDescent:
                 node.left = self.command()
 
             node.right = self.rep_block()
-
-
         return node
 
 
@@ -166,12 +158,6 @@ def main():
 
     input_lines = [] 
 
-    #for line in sys.stdin:
-    #    input_lines.append(line)
-
-    #input_text = ''.join(input_lines)
-
-    # Has been chanaged to read input in lexer!
     input_text = " "
     lexer = Lexer()
 
