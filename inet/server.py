@@ -4,13 +4,14 @@ from _thread import *
 
 class Server:
 
-    pos = [(0,0), (100,100)]
+    pos = [(0,0), (25,25)]
 
     def __init__(self): 
 
-        self.address = "192.168.0.191"
+        self.address = "192.168.1.163"
         self.port = 5555
         self.pos = [[0,0], [100,100]]
+        self.connections = []
 
     def start(self):
 
@@ -38,6 +39,8 @@ class Server:
             #TODO start threads so it can be connected to two
 
             start_new_thread(self.threaded_client, (conn, current_player))
+
+            self.connections.append(conn)
 
             current_player += 1
 
@@ -77,7 +80,8 @@ class Server:
                 print("Skickar: ", reply)
 
             
-            conn.sendall(str.encode(reply))
+            for connection in self.connections:
+                connection.sendall(str.encode(reply))
 
         print("Tappade anslutningen")
         conn.close()

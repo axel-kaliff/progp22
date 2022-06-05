@@ -2,11 +2,12 @@ import socket
 import keyboard
 import sys
 from _thread import *
+import threading
 
 class Client:
 
 
-    def __init__(self, server="192.168.0.191"):
+    def __init__(self, server="192.168.1.163"):
 
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -25,42 +26,56 @@ class Client:
             pass
 
     def send(self, data):
-        print("sending")
-
         try:
             self.client.send(str.encode(data))
-            return self.client.recv(2048).decode()
+            return "sent command"
+            #return self.client.recv(2048).decode()
         except socket.error as e:
             print(e)
 
-    def update_game(self, 
+def update_game(c):
+    while True:
+        try:
+            data_received = c.client.recv(2048).decode()
+            print(data_received)
+        except socket.error as e:
+            print(e)
+
+def take_user_input(c):
+    while True:
+        user_input = input()
+        if user_input.strip() == "d":
+            print(c.send("RIGHT"))
+        elif user_input.strip() == "a":
+            print(c.send("LEFT"))
+        elif user_input.strip() == "s":
+            print(c.send("DOWN"))
+        elif user_input.strip() == "w":
+            print(c.send("UP"))
+
 
 
 def main():
 
-    client = Client("192.168.0.191")
+    client = Client("192.168.1.163")
 
     print(client.connect())
 
+    threads = []
 
-    while True:
-        # ska det här skapas trådar för input/output?
+    t1 = threading.Thread(target=update_game, args=(client, ))
+    t1.daemon = True
+    t1.start()
 
-        # TODO split into two threads so it can wait for user input and update when the other user moves
+    take_user_input(client)
+    #t2.start()
 
-        start_new_thread(update_game, (conn, current_player))
-        user_input = input()
+    #t2 = threading.Thread(target=take_user_input, args=(client, ))
+    #t2.join()
 
-        if user_input.strip() == "d":
-            print(client.send("RIGHT"))
-        elif user_input.strip() == "a":
-            print(client.send("LEFT"))
-        elif user_input.strip() == "s":
-            print(client.send("DOWN"))
-        elif user_input.strip() == "w":
-            print(client.send("UP"))
-
-
+    #start_new_thread(update_game, (client, ))
+    #start_new_thread(take_user_input, (client, ))
+        
 if __name__ == "__main__":
     main()
 
