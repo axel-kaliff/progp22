@@ -1,4 +1,5 @@
 import socket
+import curses
 import keyboard
 import sys
 from _thread import *
@@ -34,30 +35,40 @@ class Client:
             print(e)
 
 def update_game(c):
+    screen = curses.initscr()
+
+    data_received = c.client.recv(2048).decode()
     while True:
         try:
+            screen.clear()
+            screen.addstr(0,0,data_received)
+            screen.refresh()
             data_received = c.client.recv(2048).decode()
-            print(data_received)
         except socket.error as e:
             print(e)
 
 def take_user_input(c):
     while True:
-        user_input = input()
-        if user_input.strip() == "d":
-            print(c.send("RIGHT"))
-        elif user_input.strip() == "a":
-            print(c.send("LEFT"))
-        elif user_input.strip() == "s":
-            print(c.send("DOWN"))
-        elif user_input.strip() == "w":
-            print(c.send("UP"))
+
+        event = keyboard.read_event()
+
+        if keyboard.is_pressed("left"):
+            c.send("LEFT")
+
+        if keyboard.is_pressed("right"):
+            c.send("RIGHT")
+
+        if keyboard.is_pressed("up"):
+            c.send("UP")
+
+        if keyboard.is_pressed("down"):
+            c.send("DOWN")
 
 
 
 def main():
 
-    client = Client("192.168.1.163")
+    client = Client("130.229.186.228")
 
     print(client.connect())
 
@@ -68,13 +79,6 @@ def main():
     t1.start()
 
     take_user_input(client)
-    #t2.start()
-
-    #t2 = threading.Thread(target=take_user_input, args=(client, ))
-    #t2.join()
-
-    #start_new_thread(update_game, (client, ))
-    #start_new_thread(take_user_input, (client, ))
         
 if __name__ == "__main__":
     main()

@@ -5,17 +5,19 @@ from _thread import *
 class Server:
 
     pos = [(0,0), (25,25)]
+    current_player = 0
 
     def __init__(self): 
 
-        self.address = "192.168.1.163"
+        self.address = "130.229.186.228"
         self.port = 5555
         self.pos = [[0,0], [100,100]]
         self.connections = []
+        self.current_player = 0
 
     def start(self):
 
-        current_player = 0
+        self.current_player = 0
 
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -38,11 +40,11 @@ class Server:
 
             #TODO start threads so it can be connected to two
 
-            start_new_thread(self.threaded_client, (conn, current_player))
+            start_new_thread(self.threaded_client, (conn, self.current_player))
 
             self.connections.append(conn)
 
-            current_player += 1
+            self.current_player += 1
 
 
     def make_move(self, command, player):
@@ -84,6 +86,7 @@ class Server:
                 connection.sendall(str.encode(reply))
 
         print("Tappade anslutningen")
+        self.current_player -= 1
         conn.close()
             
 
