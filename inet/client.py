@@ -30,7 +30,6 @@ class Client:
         try:
             self.client.send(str.encode(data))
             return "sent command"
-            #return self.client.recv(2048).decode()
         except socket.error as e:
             print(e)
 
@@ -38,11 +37,57 @@ def update_game(c):
     screen = curses.initscr()
 
     data_received = c.client.recv(2048).decode()
+    
     while True:
         try:
             screen.clear()
-            screen.addstr(0,0,data_received)
+
+            info = data_received.split("|")
+
             screen.refresh()
+
+            for wall in info[0].split(" "):
+                wall_pos = wall.split(",")
+                wall_x = int(wall_pos[0])
+                wall_y = int(wall_pos[1])
+                screen.addstr(wall_x, wall_y, "W")
+
+            key_pos = info[1].split(",")
+            key_x = int(key_pos[0])
+            key_y = int(key_pos[1])
+
+            if info[2] == "0,0":
+                screen.addstr(key_x, key_y, "K")
+
+            plate_door_info = info[3].split(",")
+            if plate_door_info[0] == "1":
+                screen.addstr(int(plate_door_info[1]), int(plate_door_info[2]), "D")
+
+            key_door_info = info[4].split(",")
+            if key_door_info[0] == "1":
+                screen.addstr(int(key_door_info[1]), int(key_door_info[2]), "D")
+
+            for (number, player) in enumerate(info[6].split(" ")):
+                player_pos = wall.split(",")
+                player_x = int(wall_pos[0])
+                player_y = int(wall_pos[1])
+                if number == 0:
+                    screen.addstr(wall_x, wall_y, "1")
+                else:
+                    screen.addstr(wall_x, wall_y, "2")
+
+            if info[5] == "1":
+                screen.clear()
+                screen.addstr("GAME OVER")
+
+            if info[7] == "1":
+                screen.clear()
+                screen.addstr("WAITING FOR 1 MORE PLAYER")
+            
+
+            screen.refresh()
+            
+
             data_received = c.client.recv(2048).decode()
         except socket.error as e:
             print(e)
@@ -54,21 +99,19 @@ def take_user_input(c):
 
         if keyboard.is_pressed("left"):
             c.send("LEFT")
-
         if keyboard.is_pressed("right"):
             c.send("RIGHT")
-
         if keyboard.is_pressed("up"):
             c.send("UP")
-
         if keyboard.is_pressed("down"):
             c.send("DOWN")
 
 
 
 def main():
+    print("hi")
 
-    client = Client("130.229.186.228")
+    client = Client("192.168.1.163")
 
     print(client.connect())
 

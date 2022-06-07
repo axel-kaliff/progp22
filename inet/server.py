@@ -9,7 +9,7 @@ class Server:
 
     def __init__(self): 
 
-        self.address = "130.229.186.228"
+        self.address = "192.168.1.163"
         self.port = 5555
         self.pos = [[0,0], [100,100]]
         self.connections = []
@@ -35,6 +35,7 @@ class Server:
         while True:
 
             conn, addr = s.accept()
+            
 
             print(f"{addr} ansluten")
 
@@ -76,7 +77,25 @@ class Server:
                 print("Ifrånkopplad")
                 break
             else:
-                reply = "Player 0: ( {player_one_x} , {player_one_y} ). Player 1: ({player_two_x} , {player_two_y})".format(player_one_x = self.pos[0][0], player_one_y = self.pos[0][1], player_two_x = self.pos[1][0], player_two_y = self.pos[1][1])
+
+                # wall positions
+                reply = "0,3 0,1 1,1 1,2 1,3 1,4"
+                # key position
+                reply += "|" + "4,4"
+                # player/key status
+                reply += "|" + "0,0"
+                # plate door status and position
+                reply += "|" + "1,5,5"
+                # key door status and position
+                reply += "|" + "1,2,2"
+                # win status
+                reply += "|" + "1"
+                # player positions
+                reply += "|" + "0,0 10,10"
+
+                # number of current players
+                reply += "|" + str(self.current_player)
+
 
                 print("Mottog: ", command)
                 print("Skickar: ", reply)
@@ -87,6 +106,7 @@ class Server:
 
         print("Tappade anslutningen")
         self.current_player -= 1
+        self.connections.remove(conn)
         conn.close()
             
 
