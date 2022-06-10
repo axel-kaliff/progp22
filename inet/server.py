@@ -36,16 +36,16 @@ class Server:
 
         while True:
 
-            conn, addr = s.accept()
-            print(f"{addr} ansluten")
-            #TODO start threads so it can be connected to two
-            start_new_thread(self.threaded_client, (conn, self.current_player))
-            self.connections.append(conn)
-            self.current_player += 1
+            if self.current_player <= 2:
+                conn, addr = s.accept()
+                print(f"{addr} ansluten")
+                self.current_player += 1
+                start_new_thread(self.threaded_client, (conn, self.current_player))
+                self.connections.append(conn)
 
     def threaded_client(self, conn, player):
 
-        conn.send(str.encode("Ansluten"))
+        conn.send(str.encode("CONNECTED WAITING FOR PLAYER"))
         reply = ""
         self.game.add_player()
 
@@ -56,7 +56,7 @@ class Server:
             command = data.decode("utf-8")
             
             if self.game.player1 and self.game.player2:
-                self.game.move(player + 1, command)
+                self.game.move(player, command)
 
             if not data:
                 print("Ifrånkopplad")
@@ -70,7 +70,6 @@ class Server:
                     reply = self.game.print_state()
              
                 print("Mottog: ", command)
-                #print("Skickar: ", reply)
 
             for connection in self.connections:
                 connection.sendall(str.encode(reply))

@@ -7,7 +7,7 @@ import threading
 
 class Client:
 
-
+    #def __init__(self, server="130.229.171.227"):
     def __init__(self, server="130.229.185.52"):
 
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -110,8 +110,6 @@ def take_user_input(c):
 
 
 def main():
-    print("hi")
-
     client = Client("130.229.185.52")
 
     print(client.connect())
