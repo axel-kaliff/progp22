@@ -26,6 +26,6 @@
                 | <right> <decimal> <period> | <down> <period> | <up> <period> 
                 | <color> <hex> <period>
 
-<reps>      ::= <rep> <decimal> <quote> <block> <quote>
+<reps>      ::= <rep> <decimal> <quote> <block> <quote> | <rep> <decimal> <command>
 
 

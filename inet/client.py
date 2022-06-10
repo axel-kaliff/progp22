@@ -7,11 +7,8 @@ import threading
 
 class Client:
 
-    # OLIVIA
-    #def __init__(self, server="130.229.171.227"): 
-    #GRACE
-    def __init__(self, server="130.229.185.52"):
-        # setting up for a connection to server
+   def __init__(self, server="130.229.171.227"):
+
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.port = 5555
         self.server = server
@@ -119,9 +116,7 @@ def take_user_input(c):
 
 
 def main():
-    # GRACE
-    client = Client("130.229.185.52")
-    #OLIVIA
+    #client = Client("130.229.185.52")
     client = Client("130.229.171.227")
 
     print(client.connect())
