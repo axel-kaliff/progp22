@@ -29,23 +29,39 @@ All game logic happens server-side.
 When a client connects server sends info about player ID, initial positions and board side length
 
 ## Server -> Client
-Server sends info about player positions and board status to the player in a utf-8 string with the following structure: "[{1}],{2,3,4,5}] "
 
-Where:
-- 1 = Square type
-- 2 = Player ID
-- 3 = Player level
-- 4 = Player X-position
-- 5 = Player Y-position
 
-The {} means repeating entries. Square entries are sent as one sequence, being broken up into rows by the client based on initial conditions sent by server
+### Before the game
+Before two players have joined the session, the server will output a "0" to signal that it is waiting for one more player before the game can begin.
+
+### During the game
+
+The different sections of game data is seperated by "|" and in cases where there are multiple data entries within two "|"s, the data entries are seperated by a blank space " ".
+
+Coordinate data is always two integers (possible multiple digits) seperated by a ",".
+
+The order of the data sectiona is as following (data with multiple entries marked with an "m" in parentheses):
+
+- Wall coordinates (m)
+- Door coordinates (m)
+- Key coordinates
+- Trophy coordinates
+- Pressure plate coordinates
+- Player coordinates (m)
+
+### After the game
+When one player reaches the trophy, the game is one and the server will output a "1" to all connected clients.
+
 
 ## Client -> Server
-Client sends player comamand to server in utf-8 string: "command code"
+Client sends player command to server in UTF-8 string 
 
-Command codes:
+The command represents the direction the player wants to move, and is one of four directions:
 
-- 1 = left
-- 2 = right
-- 3 = up
-- 4 = down
+- "RIGHT"
+- "LEFT"
+- "UP"
+- "DOWN"
+
+The commands must be in uppercase to be accepted by the server
+
