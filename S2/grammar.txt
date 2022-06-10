@@ -20,12 +20,14 @@
 
 <program>   ::= <block>
 
-<block>     ::= <command> <block> | <reps> <block> |  ""
+<block>     ::= <command> <block> | <reps> <block> |  (empty)
+
+<rep-block> ::= <command> <rep-block> | <reps> <rep-block> |  (empty)
             
 <command>   ::= <forw> <decimal> <period> | <back> <decimal> <period> | <left> <decimal> <period> 
                 | <right> <decimal> <period> | <down> <period> | <up> <period> 
                 | <color> <hex> <period>
 
-<reps>      ::= <rep> <decimal> <quote> <block> <quote> | <rep> <decimal> <command>
+<reps>      ::= <rep> <decimal> <quote> <rep-block> <quote> | <rep> <decimal> <command>
 
 
