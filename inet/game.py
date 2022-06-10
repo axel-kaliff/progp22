@@ -21,11 +21,11 @@ class GameCharacter:
 
         elif direction == "UP":
 
-            new_position[1] += 1
+            new_position[1] -= 1
 
         elif direction == "DOWN":
 
-            new_position[1] -= 1
+            new_position[1] += 1
 
         return new_position
 
@@ -34,7 +34,7 @@ class Game:
 
     # The initial (and unchanging) layout of the map
 
-    start_position_1 = [4, 10]
+    start_position_1 = [17, 2]
     start_position_2 = [7, 10]
 
     left_wall = [[0,0], [0,1], [0,3], [0,4], [0,5], [0,6], [0,7], [0,8], [0,9], [0,10], [0,11], [0,12], [0,13], [0,14]]
@@ -64,6 +64,41 @@ class Game:
         self.player2 = None
 
         self.walls = self.left_wall + self.right_wall + self.lower_wall + self.top_wall + self.final_room + self.key_room
+
+    def print_state(self):
+        output = ""
+        
+        for wall in self.walls:
+            output += str(wall[0]) + "," + str(wall[1]) + " "
+
+        output += "|"
+        doors = []
+        if not self.small_door_open:
+            doors += self.small_door
+        if not self.big_door_open:
+            doors += self.big_door
+        for door in doors:
+            output += str(door[0]) + "," + str(door[1]) + " "
+        if doors == []:
+            output += " "
+
+        output += "|"
+        if self.key_on_board:
+            output += str(self.key_position[0]) + "," + str(self.key_position[1])
+        else: 
+            output += " "
+
+        output += "|"
+        output += str(self.prize_position[0]) + "," + str(self.prize_position[1])
+
+        output += "|"
+        output += str(self.pressure_plate[0]) + "," + str(self.pressure_plate[1])
+        
+        output += "|"
+        for player in [self.player1, self.player2]:
+            output += str(player.position[0]) + "," + str(player.position[1]) + " "
+
+        return output
 
     # A new player is added to the board (up to two plqyers)
     # Returns:  The number of the player or None if the game already has two players
@@ -130,8 +165,11 @@ class Game:
         # Player moves to key position and picks up key
         elif self.key_on_board and new_position == self.key_position:
 
+            print("PICKS UP KEY")
+
             player.position = new_position
             player.has_key = True
+            self.key_on_board = False
 
             return True
 
@@ -158,10 +196,13 @@ class Game:
 
             player.position = new_position
 
+            print("ON PRESSURE PLATE")
+
             return True
 
         # Player moves off pressure plate and small door closes
         elif player.on_pressure_plate:
+
 
             player.on_pressure_plate = False
             self.small_door_open = False
@@ -190,184 +231,4 @@ if __name__ == "__main__":
     print(f"Added players {first}:{game.player1.position}  and {second}:{game.player2.position}")
 
     print("Player 2")
-
-    game.move(second, "RIGHT")
-    print(game.player2.position)
-
-    game.move(second, "RIGHT")
-    print(game.player2.position)
-
-    game.move(second, "RIGHT")
-    print(game.player2.position)
-
-    game.move(second, "RIGHT")
-    print(game.player2.position)
-
-    game.move(second, "RIGHT")
-    print(game.player2.position)
-
-    game.move(second, "RIGHT")
-    print(game.player2.position)
-
-    game.move(second, "RIGHT")
-    print(game.player2.position)
-
-    game.move(second, "RIGHT")
-    print(game.player2.position)
-
-    game.move(second, "RIGHT")
-    print(game.player2.position)
-
-    game.move(second, "DOWN")
-    print(game.player2.position)
-
-    game.move(second, "DOWN")
-    print(game.player2.position)
-
-    print("Player 1")
-
-    game.move(first, "RIGHT")
-    print(game.player1.position)
-
-    game.move(first, "RIGHT")
-    print(game.player1.position)
-
-    game.move(first, "RIGHT")
-    print(game.player1.position)
-
-    game.move(first, "RIGHT")
-    print(game.player1.position)
-
-    game.move(first, "RIGHT")
-    print(game.player1.position)
-
-    game.move(first, "RIGHT")
-    print(game.player1.position)
-
-    game.move(first, "RIGHT")
-    print(game.player1.position)
-
-    game.move(first, "DOWN")
-    print(game.player1.position)
-
-    game.move(first, "DOWN")
-    print(game.player1.position)
-
-    game.move(first, "DOWN")
-    print(game.player1.position)
-
-    game.move(first, "DOWN")
-    print(game.player1.position)
-
-    game.move(first, "DOWN")
-    print(game.player1.position)
-
-    game.move(first, "DOWN")
-    print(game.player1.position)
-
-    game.move(first, "DOWN")
-    print(game.player1.position)
-
-    game.move(first, "RIGHT")
-    print(game.player1.position)
-
-    game.move(first, "RIGHT")
-    print(game.player1.position)
-
-    game.move(first, "RIGHT")
-    print(game.player1.position)
-
-    game.move(first, "RIGHT")
-    print(game.player1.position)
-
-    game.move(first, "RIGHT")
-    print(game.player1.position)
-
-    game.move(first, "RIGHT")
-    print(game.player1.position)
-
-    game.move(first, "RIGHT")
-    print(game.player1.position)
-
-    game.move(first, "RIGHT")
-    print(game.player1.position)
-
-    game.move(first, "RIGHT")
-    print(game.player1.position)
-
-    print(game.player1.has_key)
-
-    game.move(first, "LEFT")
-    print(game.player1.position)
-
-    game.move(first, "LEFT")
-    print(game.player1.position)
-
-    game.move(first, "LEFT")
-    print(game.player1.position)
-
-    game.move(first, "LEFT")
-    print(game.player1.position)
-
-    game.move(first, "LEFT")
-    print(game.player1.position)
-
-    game.move(first, "LEFT")
-    print(game.player1.position)
-
-    game.move(first, "LEFT")
-    print(game.player1.position)
-
-    game.move(first, "UP")
-    print(game.player1.position)
-
-    game.move(first, "UP")
-    print(game.player1.position)
-
-    game.move(first, "UP")
-    print(game.player1.position)
-
-    game.move(first, "UP")
-    print(game.player1.position)
-
-    game.move(first, "UP")
-    print(game.player1.position)
-
-    game.move(first, "UP")
-    print(game.player1.position)
-
-    game.move(first, "UP")
-    print(game.player1.position)
-
-    game.move(first, "UP")
-    print(game.player1.position)
-
-    game.move(first, "UP")
-    print(game.player1.position)
-
-    game.move(first, "UP")
-    print(game.player1.position)
-
-    game.move(first, "UP")
-    print(game.player1.position)
-
-    game.move(first, "UP")
-    print(game.player1.position)
-
-    game.move(first, "UP")
-    print(game.player1.position)
-
-    game.move(first, "LEFT")
-    print(game.player1.position)
-
-    game.move(first, "UP")
-    print(game.player1.position)
-
-    print(game.game_won)
-
-    game.move(first, "UP")
-    print(game.player1.position)
-
-    game.move(first, "UP")
-    print(game.player1.position)
 

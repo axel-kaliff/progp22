@@ -8,7 +8,7 @@ import threading
 class Client:
 
 
-    def __init__(self, server="192.168.1.163"):
+    def __init__(self, server="130.229.185.52"):
 
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -33,6 +33,44 @@ class Client:
         except socket.error as e:
             print(e)
 
+def print_map(screen, data):
+        info = data.split("|")
+
+        screen.refresh()
+
+        for wall in info[0].split(" ")[:-1]:
+            wall_pos = wall.split(",")
+            wall_x = int(wall_pos[0])
+            wall_y = int(wall_pos[1])
+            screen.addstr(wall_x, wall_y, "w")
+
+        for door in info[1].split(" ")[:-1]:
+            door_pos = door.split(",")
+            screen.addstr(int(door_pos[0]), int(door_pos[1]), "D")
+
+
+        if not info[2] == " ":
+            key_pos = info[2].split(",")
+            key_x = int(key_pos[0])
+            key_y = int(key_pos[1])
+            screen.addstr(key_x, key_y, "K")
+
+        prize_pos = info[3].split(",")
+        screen.addstr(int(prize_pos[0]), int(prize_pos[1]), "T")
+
+        pressure_pos = info[4].split(",")
+        screen.addstr(int(pressure_pos[0]), int(pressure_pos[1]), "P")
+
+        
+        for (number, player) in enumerate(info[5].split(" ")[:-1]):
+            player_pos = player.split(",")
+            player_x = int(player_pos[0])
+            player_y = int(player_pos[1])
+            if number == 0:
+                screen.addstr(player_x, player_y, "1")
+            else:
+                screen.addstr(player_x, player_y, "2")
+
 def update_game(c):
     screen = curses.initscr()
 
@@ -41,50 +79,13 @@ def update_game(c):
     while True:
         try:
             screen.clear()
-
-            info = data_received.split("|")
-
-            screen.refresh()
-
-            for wall in info[0].split(" "):
-                wall_pos = wall.split(",")
-                wall_x = int(wall_pos[0])
-                wall_y = int(wall_pos[1])
-                screen.addstr(wall_x, wall_y, "W")
-
-            key_pos = info[1].split(",")
-            key_x = int(key_pos[0])
-            key_y = int(key_pos[1])
-
-            if info[2] == "0,0":
-                screen.addstr(key_x, key_y, "K")
-
-            plate_door_info = info[3].split(",")
-            if plate_door_info[0] == "1":
-                screen.addstr(int(plate_door_info[1]), int(plate_door_info[2]), "D")
-
-            key_door_info = info[4].split(",")
-            if key_door_info[0] == "1":
-                screen.addstr(int(key_door_info[1]), int(key_door_info[2]), "D")
-
-            for (number, player) in enumerate(info[6].split(" ")):
-                player_pos = wall.split(",")
-                player_x = int(wall_pos[0])
-                player_y = int(wall_pos[1])
-                if number == 0:
-                    screen.addstr(wall_x, wall_y, "1")
-                else:
-                    screen.addstr(wall_x, wall_y, "2")
-
-            if info[5] == "1":
-                screen.clear()
-                screen.addstr("GAME OVER")
-
-            if info[7] == "1":
-                screen.clear()
-                screen.addstr("WAITING FOR 1 MORE PLAYER")
+            if data_received == "0":
+                screen.addstr(0, 0, "WAITING FOR 1 MORE PLAYER")
+            elif data_received == "1":
+                screen.addstr(0, 0, "GAME WON!!!!")
+            else:
+                print_map(screen, data_received)
             
-
             screen.refresh()
             
 
@@ -92,9 +93,9 @@ def update_game(c):
         except socket.error as e:
             print(e)
 
+
 def take_user_input(c):
     while True:
-
         event = keyboard.read_event()
 
         if keyboard.is_pressed("left"):
@@ -111,7 +112,7 @@ def take_user_input(c):
 def main():
     print("hi")
 
-    client = Client("192.168.1.163")
+    client = Client("130.229.185.52")
 
     print(client.connect())
 
