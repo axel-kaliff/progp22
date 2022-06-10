@@ -11,7 +11,7 @@ class Server:
 
     def __init__(self): 
 
-        self.address = "130.229.185.52"
+        self.address = "130.229.171.227"
         self.port = 5555
         self.connections = []
         self.current_player = 0
