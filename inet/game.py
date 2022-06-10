@@ -132,6 +132,9 @@ class Game:
         elif player_number == 2:
             player = self.player2
 
+        print("PLAYER NUMBER")
+        print(player_number)
+
 
         # The new position is calculated, but not moved to before conditions are checked
         new_position = player.calculate_move(direction)
